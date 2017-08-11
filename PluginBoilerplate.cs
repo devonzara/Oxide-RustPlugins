@@ -4,9 +4,6 @@
  * hooks, use statements, and other features you don't require.
  */
 
-using System;
-using UnityEngine;
-
 namespace Oxide.Plugins
 {
     /**
@@ -38,7 +35,7 @@ namespace Oxide.Plugins
         /// <summary>
         /// Instance of our <see cref="Logger"/> for later.
         /// </summary>
-        private readonly Logger _logger = new Logger();
+        private readonly Logger _logger = new Logger(Logger.LogLevel.INFO);
         
         /// <summary>
         /// This is called when a plugin is being initialized.
@@ -116,23 +113,28 @@ namespace Oxide.Plugins
         public class Logger
         {
             /// <summary>
-            /// Determines if the logger should output messages or not.
-            /// </summary>
-            public bool DebugEnabled { get; set; }
-            
-            /// <summary>
             /// The name of the current plugin.
             /// </summary>
             private readonly string _pluginName;
 
             /// <summary>
+            /// The severity level of log messages to show.
+            /// </summary>
+            public LogLevel Level { get; set; }
+
+            /// <summary>
+            /// The possible severity levels.
+            /// </summary>
+            public enum LogLevel {TRACE, INFO, DEBUG, WARNING, ERROR, FATAL, DISABLED}
+
+            /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="debugEnabled">Determines if the logger should output messages or not.</param>
-            public Logger(bool debugEnabled = true)
+            /// <param name="level">The severity level of log messages to show.</param>
+            public Logger(LogLevel level = LogLevel.WARNING)
             {
+                Level = level;
                 _pluginName = GetPluginName().ToString();
-                DebugEnabled = debugEnabled;
             }
 
             /// <summary>
@@ -158,7 +160,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Trace(string text)
             {
-                LogMessage($"!!TRACE!! {text}");
+                LogMessage(LogLevel.TRACE, text);
             }
 
             /// <summary>
@@ -167,7 +169,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Info(string text)
             {
-                LogMessage($"[INFO] {text}");
+                LogMessage(LogLevel.INFO, text);
             }
 
             /// <summary>
@@ -176,7 +178,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Debug(string text)
             {
-                LogMessage($"[DEBUG] {text}");
+                LogMessage(LogLevel.DEBUG, text);
             }
 
             /// <summary>
@@ -185,7 +187,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Warning(string text)
             {
-                LogMessage($"[WARNING] {text}");
+                LogMessage(LogLevel.WARNING, text);
             }
 
             /// <summary>
@@ -194,7 +196,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Error(string text)
             {
-                LogMessage($"[ERROR] {text}");
+                LogMessage(LogLevel.ERROR, text);
             }
 
             /// <summary>
@@ -203,19 +205,20 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Fatal(string text)
             {
-                LogMessage($"[FATAL] {text}");
+                LogMessage(LogLevel.FATAL, text);
             }
             #endregion
-            
+
             /// <summary>
             /// Writes the log entry to the console if necessary.
             /// </summary>
+            /// <param name="level">The severity level of the log entry.</param>
             /// <param name="text">The text content of the log entry.</param>
-            private void LogMessage(string text)
+            private void LogMessage(LogLevel level, string text)
             {
-                if (DebugEnabled)
+                if (level >= Level)
                 {
-                    UnityEngine.Debug.Log($"[{_pluginName}] {text}");
+                    UnityEngine.Debug.Log($"[{_pluginName}] [{level}] {text}");
                 }
             }
         }
