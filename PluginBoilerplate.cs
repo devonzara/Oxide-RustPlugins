@@ -4,6 +4,9 @@
  * hooks, use statements, and other features you don't require.
  */
 
+using System;
+using UnityEngine;
+
 namespace Oxide.Plugins
 {
     /**
@@ -31,6 +34,12 @@ namespace Oxide.Plugins
 
     public class PluginBoilerplate : RustPlugin
     {
+        #region PluginBody
+        /// <summary>
+        /// Instance of our <see cref="Logger"/> for later.
+        /// </summary>
+        private readonly Logger _logger = new Logger();
+        
         /// <summary>
         /// This is called when a plugin is being initialized.
         /// Other plugins may or may not be present just yet
@@ -38,7 +47,7 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
-            Puts("[INFO] Plugin initialized!");
+            _logger.LogMessage("[INFO] Plugin initialized!");
         }
 
         /// <summary>
@@ -48,14 +57,14 @@ namespace Oxide.Plugins
         /// </summary>
         private void Loaded()
         {
-            Puts("[INFO] Plugin loaded!");
+            _logger.LogMessage("[INFO] Plugin loaded!");
         }
 
         /// <summary>
         /// This is called when a plugin is being unloaded.
         /// </summary>
         private void Unload() {
-            Puts("[INFO] Plugin unloaded!");
+            _logger.LogMessage("[INFO] Plugin unloaded!");
         }
 
         /// <summary>
@@ -66,7 +75,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that is being initialized.</param>
         private void OnPlayerInit(BasePlayer player)
         {
-            Puts($"[INFO] Player {player.displayName} initialized!");
+            _logger.LogMessage($"[INFO] Player {player.displayName} initialized!");
         }
 
         /// <summary>
@@ -77,7 +86,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has woken up.</param>
         private void OnPlayerSleepEnded(BasePlayer player)
         {
-            Puts($"[INFO] Player {player.displayName} has woken!");
+            _logger.LogMessage($"[INFO] Player {player.displayName} has woken!");
         }
 
         /// <summary>
@@ -88,7 +97,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has fallen asleep.</param>
         private void OnPlayerSleep(BasePlayer player)
         {
-            Puts($"[INFO] Player {player.displayName} has fallen asleep!");
+            _logger.LogMessage($"[INFO] Player {player.displayName} has fallen asleep!");
         }
         
         /// <summary>
@@ -97,7 +106,40 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has disconnected.</param>
         private void OnPlayerDisconnected(BasePlayer player)
         {
-            Puts($"[INFO] Player {player.displayName} has disconnected!");
+            _logger.LogMessage($"[INFO] Player {player.displayName} has disconnected!");
+        }
+        #endregion
+
+        /// <summary>
+        /// Simple logger class to easily enable/disable console logging.
+        /// </summary>
+        public class Logger
+        {
+            /// <summary>
+            /// Determines if the logger should output messages or not.
+            /// </summary>
+            public bool Debug { get; set; }
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="debug">Determines if the logger should output messages or not.</param>
+            public Logger(bool debug = true)
+            {
+                Debug = debug;
+            }
+            
+            /// <summary>
+            /// Writes the log entry to the console if necessary.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void LogMessage(string text)
+            {
+                if (Debug)
+                {
+                    UnityEngine.Debug.Log(text);
+                }
+            }
         }
     }
 }
