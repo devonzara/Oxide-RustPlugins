@@ -119,6 +119,11 @@ namespace Oxide.Plugins
             /// Determines if the logger should output messages or not.
             /// </summary>
             public bool DebugEnabled { get; set; }
+            
+            /// <summary>
+            /// The name of the current plugin.
+            /// </summary>
+            private readonly string _pluginName;
 
             /// <summary>
             /// Constructor.
@@ -126,7 +131,24 @@ namespace Oxide.Plugins
             /// <param name="debugEnabled">Determines if the logger should output messages or not.</param>
             public Logger(bool debugEnabled = true)
             {
+                _pluginName = GetPluginName().ToString();
                 DebugEnabled = debugEnabled;
+            }
+
+            /// <summary>
+            /// Gets the name of the plugin from the type's full name.
+            /// </summary>
+            /// <returns>The name of the plugin.</returns>
+            private string GetPluginName()
+            {
+                string fullName = this.GetType().FullName;
+                int start = fullName.LastIndexOf('.');
+                int end = fullName.IndexOf('+');
+
+                start = start >= 0 ? ++start : 0;
+                end = end >= 0 ? end - start : fullName.Length - 1;
+
+                return fullName.Substring(start, end);
             }
             
             #region LogLevelMethods
@@ -136,7 +158,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Trace(string text)
             {
-                LogMessage($"[TRACE] {text}");
+                LogMessage($"!!TRACE!! {text}");
             }
 
             /// <summary>
@@ -193,7 +215,7 @@ namespace Oxide.Plugins
             {
                 if (DebugEnabled)
                 {
-                    UnityEngine.Debug.Log(text);
+                    UnityEngine.Debug.Log($"[{_pluginName}] {text}");
                 }
             }
         }
