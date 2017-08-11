@@ -47,7 +47,7 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
-            _logger.LogMessage("[INFO] Plugin initialized!");
+            _logger.Info("Plugin initialized!");
         }
 
         /// <summary>
@@ -57,14 +57,14 @@ namespace Oxide.Plugins
         /// </summary>
         private void Loaded()
         {
-            _logger.LogMessage("[INFO] Plugin loaded!");
+            _logger.Info("Plugin loaded!");
         }
 
         /// <summary>
         /// This is called when a plugin is being unloaded.
         /// </summary>
         private void Unload() {
-            _logger.LogMessage("[INFO] Plugin unloaded!");
+            _logger.Info("Plugin unloaded!");
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that is being initialized.</param>
         private void OnPlayerInit(BasePlayer player)
         {
-            _logger.LogMessage($"[INFO] Player {player.displayName} initialized!");
+            _logger.Info($"Player {player.displayName} initialized!");
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has woken up.</param>
         private void OnPlayerSleepEnded(BasePlayer player)
         {
-            _logger.LogMessage($"[INFO] Player {player.displayName} has woken!");
+            _logger.Info($"Player {player.displayName} has woken!");
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has fallen asleep.</param>
         private void OnPlayerSleep(BasePlayer player)
         {
-            _logger.LogMessage($"[INFO] Player {player.displayName} has fallen asleep!");
+            _logger.Info($"Player {player.displayName} has fallen asleep!");
         }
         
         /// <summary>
@@ -106,36 +106,92 @@ namespace Oxide.Plugins
         /// <param name="player">The player that has disconnected.</param>
         private void OnPlayerDisconnected(BasePlayer player)
         {
-            _logger.LogMessage($"[INFO] Player {player.displayName} has disconnected!");
+            _logger.Info($"Player {player.displayName} has disconnected!");
         }
         #endregion
 
         /// <summary>
-        /// Simple logger class to easily enable/disable console logging.
+        /// Simple multi-level logger class to easily enable/disable console logging.
         /// </summary>
         public class Logger
         {
             /// <summary>
             /// Determines if the logger should output messages or not.
             /// </summary>
-            public bool Debug { get; set; }
+            public bool DebugEnabled { get; set; }
 
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="debug">Determines if the logger should output messages or not.</param>
-            public Logger(bool debug = true)
+            /// <param name="debugEnabled">Determines if the logger should output messages or not.</param>
+            public Logger(bool debugEnabled = true)
             {
-                Debug = debug;
+                DebugEnabled = debugEnabled;
             }
+            
+            #region LogLevelMethods
+            /// <summary>
+            /// Log a TRACE level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Trace(string text)
+            {
+                LogMessage($"[TRACE] {text}");
+            }
+
+            /// <summary>
+            /// Log an INFO level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Info(string text)
+            {
+                LogMessage($"[INFO] {text}");
+            }
+
+            /// <summary>
+            /// Log a DEBUG level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Debug(string text)
+            {
+                LogMessage($"[DEBUG] {text}");
+            }
+
+            /// <summary>
+            /// Log a WARNING level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Warning(string text)
+            {
+                LogMessage($"[WARNING] {text}");
+            }
+
+            /// <summary>
+            /// Log an ERROR level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Error(string text)
+            {
+                LogMessage($"[ERROR] {text}");
+            }
+
+            /// <summary>
+            /// Log a FATAL level message to the console.
+            /// </summary>
+            /// <param name="text">The text content of the log entry.</param>
+            public void Fatal(string text)
+            {
+                LogMessage($"[FATAL] {text}");
+            }
+            #endregion
             
             /// <summary>
             /// Writes the log entry to the console if necessary.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void LogMessage(string text)
+            private void LogMessage(string text)
             {
-                if (Debug)
+                if (DebugEnabled)
                 {
                     UnityEngine.Debug.Log(text);
                 }
