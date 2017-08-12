@@ -4,6 +4,8 @@
  * hooks, use statements, and other features you don't require.
  */
 
+using System;
+
 namespace Oxide.Plugins
 {
     /**
@@ -32,11 +34,14 @@ namespace Oxide.Plugins
     public class PluginBoilerplate : RustPlugin
     {
         #region PluginBody
+
+        private InfoAttribute _plugin;
+        
         /// <summary>
         /// Instance of our <see cref="Logger"/> for later.
         /// </summary>
-        private readonly Logger _logger = new Logger(Logger.LogLevel.INFO);
-        
+        private Logger _logger;
+
         /// <summary>
         /// This is called when a plugin is being initialized.
         /// Other plugins may or may not be present just yet
@@ -44,9 +49,11 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
+            _plugin = (InfoAttribute) Attribute.GetCustomAttribute(this.GetType(), typeof (InfoAttribute));
+            _logger = new Logger(this, Logger.LogLevel.INFO);
             _logger.Info("Plugin initialized!");
         }
-
+        
         /// <summary>
         /// This is called when a plugin has finished loading.
         /// Other plugins may or may not be present just yet
@@ -130,27 +137,22 @@ namespace Oxide.Plugins
             /// <summary>
             /// Constructor.
             /// </summary>
+            /// <param name="plugin">An instance of the plugin.</param>
             /// <param name="level">The severity level of log messages to show.</param>
-            public Logger(LogLevel level = LogLevel.WARNING)
+            public Logger(object plugin, LogLevel level = LogLevel.WARNING)
             {
+                _pluginName = GetPluginName(plugin);
                 Level = level;
-                _pluginName = GetPluginName().ToString();
             }
 
             /// <summary>
-            /// Gets the name of the plugin from the type's full name.
+            /// Uses the Info() attribute to return the name of the curren plugin.
             /// </summary>
+            /// <param name="plugin">An instance of the plugin using the logger.</param>
             /// <returns>The name of the plugin.</returns>
-            private string GetPluginName()
+            private string GetPluginName(object plugin)
             {
-                string fullName = this.GetType().FullName;
-                int start = fullName.LastIndexOf('.');
-                int end = fullName.IndexOf('+');
-
-                start = start >= 0 ? ++start : 0;
-                end = end >= 0 ? end - start : fullName.Length - 1;
-
-                return fullName.Substring(start, end);
+                return ((InfoAttribute) Attribute.GetCustomAttribute(plugin.GetType(), typeof(InfoAttribute))).Title;
             }
             
             #region LogLevelMethods
