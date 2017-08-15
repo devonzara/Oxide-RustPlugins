@@ -5,6 +5,8 @@
  */
 
 using System;
+using Oxide.Core;
+using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
@@ -35,8 +37,6 @@ namespace Oxide.Plugins
     {
         #region PluginBody
 
-        private InfoAttribute _plugin;
-        
         /// <summary>
         /// Instance of our <see cref="Logger"/> for later.
         /// </summary>
@@ -49,8 +49,7 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
-            _plugin = (InfoAttribute) Attribute.GetCustomAttribute(this.GetType(), typeof (InfoAttribute));
-            _logger = new Logger(this, Logger.LogLevel.INFO);
+            _logger = new Logger(Title, Logger.LogLevel.INFO);
             _logger.Info("Plugin initialized!");
         }
         
@@ -139,22 +138,12 @@ namespace Oxide.Plugins
             /// </summary>
             /// <param name="plugin">An instance of the plugin.</param>
             /// <param name="level">The severity level of log messages to show.</param>
-            public Logger(object plugin, LogLevel level = LogLevel.WARNING)
+            public Logger(string pluginName, LogLevel level = LogLevel.WARNING)
             {
-                _pluginName = GetPluginName(plugin);
+                _pluginName = pluginName;
                 Level = level;
             }
 
-            /// <summary>
-            /// Uses the Info() attribute to return the name of the curren plugin.
-            /// </summary>
-            /// <param name="plugin">An instance of the plugin using the logger.</param>
-            /// <returns>The name of the plugin.</returns>
-            private string GetPluginName(object plugin)
-            {
-                return ((InfoAttribute) Attribute.GetCustomAttribute(plugin.GetType(), typeof(InfoAttribute))).Title;
-            }
-            
             #region LogLevelMethods
             /// <summary>
             /// Log a TRACE level message to the console.
