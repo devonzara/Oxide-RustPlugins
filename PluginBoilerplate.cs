@@ -147,55 +147,37 @@ namespace Oxide.Plugins
             /// Log a TRACE level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Trace(string text)
-            {
-                LogMessage(LogLevel.Trace, text);
-            }
+            public void Trace(string text) => LogMessage(LogLevel.Trace, text);
 
             /// <summary>
             /// Log an INFO level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Info(string text)
-            {
-                LogMessage(LogLevel.Info, text);
-            }
+            public void Info(string text) => LogMessage(LogLevel.Info, text);
 
             /// <summary>
             /// Log a DEBUG level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Debug(string text)
-            {
-                LogMessage(LogLevel.Debug, text);
-            }
+            public void Debug(string text) => LogMessage(LogLevel.Debug, text);
 
             /// <summary>
             /// Log a WARNING level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Warning(string text)
-            {
-                LogMessage(LogLevel.Warning, text);
-            }
+            public void Warning(string text) => LogMessage(LogLevel.Warning, text);
 
             /// <summary>
             /// Log an ERROR level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Error(string text)
-            {
-                LogMessage(LogLevel.Error, text);
-            }
+            public void Error(string text) => LogMessage(LogLevel.Error, text);
 
             /// <summary>
             /// Log a FATAL level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
-            public void Fatal(string text)
-            {
-                LogMessage(LogLevel.Fatal, text);
-            }
+            public void Fatal(string text) => LogMessage(LogLevel.Fatal, text);
 
             #endregion
 
