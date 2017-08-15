@@ -33,7 +33,7 @@ namespace Oxide.Plugins
         #region PluginBody
 
         /// <summary>
-        /// Instance of our <see cref="Logger"/> for later.
+        /// Instance of our <see cref="LogHelper"/> for later.
         /// </summary>
         private LogHelper _logger;
 
