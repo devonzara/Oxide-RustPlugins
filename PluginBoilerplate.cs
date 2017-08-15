@@ -4,10 +4,6 @@
  * hooks, use statements, and other features you don't require.
  */
 
-using System;
-using Oxide.Core;
-using Oxide.Core.Plugins;
-
 namespace Oxide.Plugins
 {
     /**
@@ -32,7 +28,6 @@ namespace Oxide.Plugins
      */
     [Info("PluginBoilerplate", "AuthorName", "0.1.0", ResourceId = 0000)]
     [Description("A boilerplate with a little bit of everything to get you started.")]
-
     public class PluginBoilerplate : RustPlugin
     {
         #region PluginBody
@@ -40,7 +35,7 @@ namespace Oxide.Plugins
         /// <summary>
         /// Instance of our <see cref="Logger"/> for later.
         /// </summary>
-        private Logger _logger;
+        private LogHelper _logger;
 
         /// <summary>
         /// This is called when a plugin is being initialized.
@@ -49,10 +44,10 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
-            _logger = new Logger(Title, Logger.LogLevel.INFO);
+            _logger = new LogHelper(Title, LogHelper.LogLevel.Info);
             _logger.Info("Plugin initialized!");
         }
-        
+
         /// <summary>
         /// This is called when a plugin has finished loading.
         /// Other plugins may or may not be present just yet
@@ -66,7 +61,8 @@ namespace Oxide.Plugins
         /// <summary>
         /// This is called when a plugin is being unloaded.
         /// </summary>
-        private void Unload() {
+        private void Unload()
+        {
             _logger.Info("Plugin unloaded!");
         }
 
@@ -93,8 +89,8 @@ namespace Oxide.Plugins
         }
 
         /// <summary>
-        /// This is called when a player is about to go to sleep. Returning a 
-        /// non-null value overrides the default behavior. This is a great 
+        /// This is called when a player is about to go to sleep. Returning a
+        /// non-null value overrides the default behavior. This is a great
         /// place to destroy custom UIs to hide while they're sleeping.
         /// </summary>
         /// <param name="player">The player that has fallen asleep.</param>
@@ -102,7 +98,7 @@ namespace Oxide.Plugins
         {
             _logger.Info($"Player {player.displayName} has fallen asleep!");
         }
-        
+
         /// <summary>
         /// This is called after a player has been disconnected.
         /// </summary>
@@ -111,12 +107,13 @@ namespace Oxide.Plugins
         {
             _logger.Info($"Player {player.displayName} has disconnected!");
         }
+
         #endregion
 
         /// <summary>
         /// Simple multi-level logger class to easily enable/disable console logging.
         /// </summary>
-        public class Logger
+        public class LogHelper
         {
             /// <summary>
             /// The name of the current plugin.
@@ -131,27 +128,28 @@ namespace Oxide.Plugins
             /// <summary>
             /// The possible severity levels.
             /// </summary>
-            public enum LogLevel {TRACE, INFO, DEBUG, WARNING, ERROR, FATAL, DISABLED}
+            public enum LogLevel { Trace, Info, Debug, Warning, Error, Fatal, Disabled }
 
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="plugin">An instance of the plugin.</param>
+            /// <param name="pluginName">An instance of the plugin.</param>
             /// <param name="level">The severity level of log messages to show.</param>
-            public Logger(string pluginName, LogLevel level = LogLevel.WARNING)
+            public LogHelper(string pluginName, LogLevel level = LogLevel.Warning)
             {
                 _pluginName = pluginName;
                 Level = level;
             }
 
             #region LogLevelMethods
+
             /// <summary>
             /// Log a TRACE level message to the console.
             /// </summary>
             /// <param name="text">The text content of the log entry.</param>
             public void Trace(string text)
             {
-                LogMessage(LogLevel.TRACE, text);
+                LogMessage(LogLevel.Trace, text);
             }
 
             /// <summary>
@@ -160,7 +158,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Info(string text)
             {
-                LogMessage(LogLevel.INFO, text);
+                LogMessage(LogLevel.Info, text);
             }
 
             /// <summary>
@@ -169,7 +167,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Debug(string text)
             {
-                LogMessage(LogLevel.DEBUG, text);
+                LogMessage(LogLevel.Debug, text);
             }
 
             /// <summary>
@@ -178,7 +176,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Warning(string text)
             {
-                LogMessage(LogLevel.WARNING, text);
+                LogMessage(LogLevel.Warning, text);
             }
 
             /// <summary>
@@ -187,7 +185,7 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Error(string text)
             {
-                LogMessage(LogLevel.ERROR, text);
+                LogMessage(LogLevel.Error, text);
             }
 
             /// <summary>
@@ -196,8 +194,9 @@ namespace Oxide.Plugins
             /// <param name="text">The text content of the log entry.</param>
             public void Fatal(string text)
             {
-                LogMessage(LogLevel.FATAL, text);
+                LogMessage(LogLevel.Fatal, text);
             }
+
             #endregion
 
             /// <summary>
