@@ -2,7 +2,17 @@
  * Note: This is a boilerplate meant for educational and jump-start
  * purposes. For best performance, it is suggested to remove all  
  * hooks, use statements, and other features you don't require.
+ *
+ * The following links may be helpful If you're new to Oxide plugin development:
+ * http://docs.oxidemod.org/
+ * http://oxidemod.org/threads/c-plugin-development-guide-and-advice-dump.23738/
+ * http://oxidemod.org/threads/plugin-submission-guidelines-and-requirements.23233/
  */
+
+using System;
+using System.Linq;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Oxide.Plugins
 {
@@ -30,10 +40,83 @@ namespace Oxide.Plugins
     [Description("A boilerplate with a little bit of everything to get you started.")]
     public class PluginBoilerplate : RustPlugin
     {
-        #region PluginBody
+        #region Config Management
 
         /// <summary>
-        /// Instance of our <see cref="LogHelper"/> for later.
+        /// Instance used for accessing config values.
+        /// </summary>
+        private PluginConfig _config;
+
+        /// <summary>
+        /// Indicates if changes to the config need saved.
+        /// </summary>
+        private bool _configIsDirty;
+
+        /// <summary>
+        /// The outer wrapper of the config structure.
+        /// </summary>
+        private class PluginConfig
+        {
+            public GeneralSettings Settings { get; set; }
+        }
+
+        /// <summary>
+        /// The configuration's general setting property definitions.
+        /// </summary>
+        private class GeneralSettings
+        {
+            [JsonProperty("Debug Level (Trace, Info, Debug, Warning, Error, Fatal, Disabled)")]
+            public string DebugLevel { get; set; }
+
+            [JsonProperty("Unused Example Property")]
+            public string UnusedExampleProperty { get; set; }
+        }
+
+        /// <summary>
+        /// Builds the default configuration object.
+        /// </summary>
+        /// <returns>The built <see cref="PluginConfig"/> configuration object.</returns>
+        private PluginConfig DefaultConfig()
+        {
+            return new PluginConfig
+            {
+                Settings = new GeneralSettings
+                {
+                    DebugLevel = Enum.GetName(typeof(LogHelper.LogLevel), LogHelper.LogLevel.Info),
+                    UnusedExampleProperty = Version.ToString()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Called when the plugin's config should be initialized.
+        /// This will only be called when the config file does
+        /// not already exist in the oxide/config directory.
+        /// </summary>
+        protected override void LoadDefaultConfig()
+        {
+            Config.WriteObject(DefaultConfig(), true);
+            _config = Config.ReadObject<PluginConfig>();
+
+            InitLogger();
+            _logger.Info("A new configuration file has been created.");
+        }
+
+        /// <summary>
+        /// Loads the config file from disk and performs integrity checks.
+        /// </summary>
+        protected override void LoadConfig()
+        {
+            base.LoadConfig();
+            if (_config == null) _config = Config.ReadObject<PluginConfig>();
+        }
+
+        #endregion
+
+        #region Plugin Body
+
+        /// <summary>
+        /// An instance of <see cref="LogHelper"/>.
         /// </summary>
         private LogHelper _logger;
 
@@ -44,8 +127,21 @@ namespace Oxide.Plugins
         /// </summary>
         private void Init()
         {
-            _logger = new LogHelper(Title, LogHelper.LogLevel.Info);
+            if (_logger == null) InitLogger();
             _logger.Info("Plugin initialized!");
+        }
+
+        /// <summary>
+        /// Initialize the LogHelper.
+        /// </summary>
+        private void InitLogger()
+        {
+            try {
+                var logLevel = (LogHelper.LogLevel) Enum.Parse(typeof(LogHelper.LogLevel), _config.Settings.DebugLevel);
+                _logger = new LogHelper(Title, logLevel);
+            } catch (Exception exception) {
+                _logger.Error("Invalid LogLevel configuration.");
+            }
         }
 
         /// <summary>
@@ -109,6 +205,8 @@ namespace Oxide.Plugins
         }
 
         #endregion
+
+        #region Log Helper
 
         /// <summary>
         /// Simple multi-level logger class to easily enable/disable console logging.
@@ -194,5 +292,7 @@ namespace Oxide.Plugins
                 }
             }
         }
+
+        #endregion
     }
 }
