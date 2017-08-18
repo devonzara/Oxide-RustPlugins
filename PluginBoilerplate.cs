@@ -7,6 +7,14 @@
  * http://docs.oxidemod.org/
  * http://oxidemod.org/threads/c-plugin-development-guide-and-advice-dump.23738/
  * http://oxidemod.org/threads/plugin-submission-guidelines-and-requirements.23233/
+ *
+ * Features:
+ * * Several commonly used hooks ready to go.
+ * * Basic config management.
+ * * Simple default Lang setup.
+ * * Custom, multi-level, LogHelper for easy debugging.
+ *   - Set your desired debug level in the plugin's config file.
+ * * Example Chat and Console command (/boilerplate) to change the debug level.
  */
 
 using System;
