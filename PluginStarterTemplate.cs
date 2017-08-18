@@ -1,7 +1,12 @@
 ﻿/**
- * Note: This is a starter template meant for educational
- * purposes. For performance and cleanliness purposes, 
- * it's always best to remove all unused game hooks.
+ * Note: This is a starter template for educational and jump-start
+ * purposes. For best performance, it is suggested to remove all  
+ * hooks, use statements, and other features you don't require.
+ *
+ * The following links may be helpful If you're new to Oxide plugin development:
+ * http://docs.oxidemod.org/
+ * http://oxidemod.org/threads/c-plugin-development-guide-and-advice-dump.23738/
+ * http://oxidemod.org/threads/plugin-submission-guidelines-and-requirements.23233/
  */
 
 namespace Oxide.Plugins
@@ -90,7 +95,7 @@ namespace Oxide.Plugins
         {
             Puts($"[INFO] Player {player.displayName} has fallen asleep!");
         }
-        
+
         /// <summary>
         /// This is called after a player has been disconnected.
         /// </summary>
