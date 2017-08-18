@@ -104,8 +104,7 @@ namespace Oxide.Plugins
         /// </summary>
         protected override void LoadDefaultConfig()
         {
-            Config.WriteObject(DefaultConfig(), true);
-            _config = Config.ReadObject<PluginConfig>();
+            _config = DefaultConfig();
 
             InitLogger();
             _logger.Info("A new configuration file has been created.");
@@ -151,7 +150,7 @@ namespace Oxide.Plugins
                 ["CmdBoilerplate_Help"] = "The <color=orange>DebugLevel</color> is currently set to \"<color=orange>{0}</color>\".\n\n Type \"<color=orange>/boilerplate <DebugLevel></color>\" to change the DebugLevel.\n <color=orange>Valid Options:</color> {1}",
                 ["CmdBoilerplate_SetTo"] = "The <color=orange>{0}</color> setting is now set to \"<color=orange>{1}</color>\".",
                 ["CmdBoilerplate_AlreadySet"] = "The <color=orange>{0}</color> setting is already set to \"<color=orange>{1}</color>\".",
-                ["Log_ChangedSetting"] = "{0} has changed the {1} setting to {2}.",
+                ["Log_ChangedSetting"] = "{0} has changed the {1} setting to \"{2}\".",
                 ["Error_InvalidOption"] = "\"<color=orange>{0}</color>\" is not a valid option."
             };
 
