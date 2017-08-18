@@ -10,7 +10,8 @@
  */
 
 using System;
-using System.Linq;
+using Oxide.Core;
+using UnityEngine;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -40,7 +41,7 @@ namespace Oxide.Plugins
     [Description("A boilerplate with a little bit of everything to get you started.")]
     public class PluginBoilerplate : RustPlugin
     {
-        #region Config Management
+        #region Config
 
         /// <summary>
         /// Instance used for accessing config values.
@@ -111,6 +112,56 @@ namespace Oxide.Plugins
             if (_config == null) _config = Config.ReadObject<PluginConfig>();
         }
 
+        /// <summary>
+        /// Persist the changes to the config file.
+        /// </summary>
+        private void UpdateConfig(string message = null, bool force = false)
+        {
+            if (!_configIsDirty && !force) return;
+
+            SaveConfig();
+            _logger.Info(message ?? "The configuration file has been updated.");
+        }
+
+        protected override void SaveConfig()
+        {
+            Config.WriteObject(_config);
+            _configIsDirty = false;
+        }
+
+        #endregion
+
+        #region Lang
+
+        /// <summary>
+        /// Registers the default Lang messages.
+        /// </summary>
+        protected override void LoadDefaultMessages()
+        {
+            var messages = new Dictionary<string, string>
+            {
+                ["CmdBoilerplate_Help"] = "The <color=orange>DebugLevel</color> is currently set to \"<color=orange>{0}</color>\".\n\n Type \"<color=orange>/boilerplate <DebugLevel></color>\" to change the DebugLevel.\n <color=orange>Valid Options:</color> {1}",
+                ["CmdBoilerplate_SetTo"] = "The <color=orange>{0}</color> setting is now set to \"<color=orange>{1}</color>\".",
+                ["CmdBoilerplate_AlreadySet"] = "The <color=orange>{0}</color> setting is already set to \"<color=orange>{1}</color>\".",
+                ["Log_ChangedSetting"] = "{0} has changed the {1} setting to {2}.",
+                ["Error_InvalidOption"] = "\"<color=orange>{0}</color>\" is not a valid option."
+            };
+
+            lang.RegisterMessages(messages, this);
+        }
+
+        /// <summary>
+        /// Builds a string from the registered messages using the Lang API.
+        /// </summary>
+        /// <param name="key">The key associated with the registered message.</param>
+        /// <param name="playerId">The player's ID.</param>
+        /// <param name="args">Arguments used to replace anchors in the registered message.</param>
+        /// <returns>Returns the built string in the preferred language.</returns>
+        private string Lang(string key, string playerId = null, params object[] args)
+        {
+            return string.Format(lang.GetMessage(key, this, playerId), args);
+        }
+
         #endregion
 
         #region Plugin Body
@@ -119,6 +170,8 @@ namespace Oxide.Plugins
         /// An instance of <see cref="LogHelper"/>.
         /// </summary>
         private LogHelper _logger;
+
+        #region Server Hooks
 
         /// <summary>
         /// This is called when a plugin is being initialized.
@@ -129,19 +182,6 @@ namespace Oxide.Plugins
         {
             if (_logger == null) InitLogger();
             _logger.Info("Plugin initialized!");
-        }
-
-        /// <summary>
-        /// Initialize the LogHelper.
-        /// </summary>
-        private void InitLogger()
-        {
-            try {
-                var logLevel = (LogHelper.LogLevel) Enum.Parse(typeof(LogHelper.LogLevel), _config.Settings.DebugLevel);
-                _logger = new LogHelper(Title, logLevel);
-            } catch (Exception exception) {
-                _logger.Error("Invalid LogLevel configuration.");
-            }
         }
 
         /// <summary>
@@ -206,6 +246,82 @@ namespace Oxide.Plugins
 
         #endregion
 
+        #region Commands
+
+        /// <summary>
+        /// An example chat command for viewing and editing the DebugLevel.
+        /// </summary>
+        /// <param name="player">A reference to the player who initiated the command.</param>
+        /// <param name="command">A string containing the command being called.</param>
+        /// <param name="args">A string array containing the command arguments.</param>
+        [ChatCommand("boilerplate")]
+        private void ChatCommandBoilerplate(BasePlayer player, string command, string[] args)
+        {
+            CommandBoilerplate(player, args);
+        }
+
+        /// <summary>
+        /// This method illustrates how to register a console command.
+        /// For the purpose of this example/boilerplate, it is just
+        /// acting as an alias for ChatCommandBoilerplate above.
+        /// </summary>
+        /// <param name="arg">An object containing the player, command args, and more.</param>
+        [ConsoleCommand("boilerplate")]
+        private void ConsoleCommandBoilerplate(ConsoleSystem.Arg arg)
+        {
+            CommandBoilerplate(arg.Player(), arg.Args ?? new string[]{});
+        }
+
+        /// <summary>
+        /// A rather dirty implementation of changing a config value from a command.
+        /// </summary>
+        /// <remarks>
+        /// A console command would typically use PrintToConsole() instead of PrintToChat().
+        /// </remarks>
+        /// <param name="player">A reference to the player who initiated the command.</param>
+        /// <param name="args">A string array containing the command arguments.</param>
+        private void CommandBoilerplate(BasePlayer player, string[] args)
+        {
+            string userId = player.UserIDString;
+
+            if (args.Length != 1) {
+                string options = string.Join(", ", Enum.GetNames(typeof(LogHelper.LogLevel)));
+                PrintToChat(player, Lang("CmdBoilerplate_Help", userId, _config.Settings.DebugLevel, options));
+                return;
+            }
+
+            if (args[0].TitleCase() == _config.Settings.DebugLevel) {
+                PrintToChat(player, Lang("CmdBoilerplate_AlreadySet", userId, "DebugLevel", args[0].TitleCase()));
+                return;
+            }
+
+            try {
+                string debugLevel = _config.Settings.DebugLevel = _logger.GetLogLevel(args[0]).ToString();
+                PrintToChat(player, Lang("CmdBoilerplate_SetTo", userId, "DebugLevel", debugLevel));
+                UpdateConfig(Lang("Log_ChangedSetting", userId, player.displayName, "DebugLevel", debugLevel), true);
+            } catch (Exception exception) {
+                PrintToChat(player, Lang("Error_InvalidOption", userId, args[0].TitleCase()));
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Initialize the LogHelper.
+        /// </summary>
+        private void InitLogger()
+        {
+            _logger = new LogHelper(Title);
+
+            try {
+                _logger = new LogHelper(Title, _logger.GetLogLevel(_config.Settings.DebugLevel));
+            } catch (Exception exception) {
+                _logger.Error("Invalid LogLevel configuration value.");
+            }
+        }
+
+        #endregion
+
         #region Log Helper
 
         /// <summary>
@@ -237,6 +353,16 @@ namespace Oxide.Plugins
             {
                 _pluginName = pluginName;
                 Level = level;
+            }
+
+            /// <summary>
+            /// Determines if the Enum key exists and returns the matching LogLevel.
+            /// </summary>
+            /// <param name="key">The key to find in the Enum.</param>
+            /// <returns>The <see cref="LogLevel"/> matching the provided key.</returns>
+            public LogLevel GetLogLevel(string key)
+            {
+                return (LogLevel) Enum.Parse(typeof(LogLevel), key.TitleCase());
             }
 
             #region LogLevelMethods
